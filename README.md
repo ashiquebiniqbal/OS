@@ -189,5 +189,3 @@ Try goals like:
 ## License
 
 MIT — see [LICENSE](LICENSE).
-#   O S  
- 
