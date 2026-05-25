@@ -1,0 +1,62 @@
+{
+  "name": "halo-os",
+  "version": "2.0.0",
+  "description": "Halo OS — sovereign agent-first sandbox desktop. Runs as a browser-based static app, or as a packaged Electron desktop app with full website embedding and LLM-driven auto-pilot for browser/CRM automation.",
+  "main": "electron/main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev:web": "python -m http.server 8000 --bind 127.0.0.1",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder",
+    "dist:win": "electron-builder --win"
+  },
+  "author": "Ashique Bin Iqbal",
+  "license": "MIT",
+  "devDependencies": {
+    "@electron/packager": "^20.0.0",
+    "electron": "^33.0.0",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "com.haloos.desktop",
+    "productName": "Halo OS",
+    "copyright": "Copyright © 2026 Halo OS",
+    "directories": {
+      "output": "release",
+      "buildResources": "assets"
+    },
+    "files": [
+      "electron/**/*",
+      "js/**/*",
+      "index.html",
+      "style.css",
+      "package.json",
+      "!**/.claude/**",
+      "!**/node_modules/electron-builder/**",
+      "!**/release/**",
+      "!**/screenshots/**",
+      "!**/*.md"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "artifactName": "${productName}-Setup-${version}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Halo OS"
+    },
+    "asar": true,
+    "compression": "normal"
+  }
+}

@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Halo OS - Agent-First Privacy Sandbox</title>
+  <!-- Modern Premium Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="theme-dark">
+
+  <!-- Dynamic Wallpapers Canvas -->
+  <canvas id="wallpaper-canvas"></canvas>
+  <div id="wallpaper-overlay"></div>
+
+  <!-- Main Desktop Layout -->
+  <div id="desktop-grid">
+    <!-- Desktop Icons (Dynamically loaded by shell.js) -->
+    <div id="desktop-icons"></div>
+
+    <!-- Active Windows Viewport -->
+    <div id="windows-container"></div>
+    
+    <!-- Drag Selection Box -->
+    <div id="drag-select"></div>
+  </div>
+
+  <!-- Agent Sidebar Copilot (Zero-Telemetry Sidebar) -->
+  <div id="agent-sidebar" class="sidebar-collapsed">
+    <div class="sidebar-header">
+      <div class="header-logo">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+          <path d="M2 12h20"></path>
+        </svg>
+        <span>Halo Copilot</span>
+      </div>
+      <button id="close-sidebar-btn" title="Collapse Sidebar">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+    
+    <div id="agent-logs" class="agent-conversation">
+      <div class="agent-bubble system">
+        <div class="bubble-content">
+          <strong>Halo Core initialized.</strong> All sessions are isolated client-side. Zero telemetry is active. Type a command or question below to control the OS.
+        </div>
+      </div>
+    </div>
+    
+    <div class="agent-input-container">
+      <input type="text" id="agent-prompt" placeholder="Say 'open explorer' or ask a question..." autocomplete="off">
+      <button id="agent-send-btn" title="Execute Command">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="22" y1="2" x2="11" y2="13"></line>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Dock Taskbar (Dynamic centered macOS style) -->
+  <div id="dock-container">
+    <div id="dock">
+      <!-- Start Menu Button -->
+      <div class="dock-item" id="start-menu-trigger" data-tooltip="Start Menu">
+        <svg viewBox="0 0 24 24" class="dock-icon start-icon" fill="currentColor">
+          <rect x="3" y="3" width="8" height="8" rx="1.5"></rect>
+          <rect x="13" y="3" width="8" height="8" rx="1.5"></rect>
+          <rect x="3" y="13" width="8" height="8" rx="1.5"></rect>
+          <rect x="13" y="13" width="8" height="8" rx="1.5"></rect>
+        </svg>
+      </div>
+      <div class="dock-divider"></div>
+      
+      <!-- App Shortcuts (Dynamic Loaded, Active Indicators) -->
+      <div id="dock-apps"></div>
+      
+      <div class="dock-divider"></div>
+      
+      <!-- System Tray (Widgets & Settings Panel) -->
+      <div class="dock-item" id="system-tray-trigger" data-tooltip="Quick Settings">
+        <div class="tray-info">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" class="tray-icon">
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
+          </svg>
+          <span id="tray-time">12:00 PM</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Start Menu Pop-up Overlay -->
+  <div id="start-menu" class="glass-panel hidden">
+    <div class="start-search-container">
+      <input type="text" id="start-search" placeholder="Search applications, files, and commands..." autocomplete="off">
+    </div>
+    
+    <div class="start-sections">
+      <div class="start-col">
+        <h3>Applications</h3>
+        <div id="start-app-list" class="app-list-grid"></div>
+      </div>
+      <div class="start-col">
+        <h3>Recent Security Actions</h3>
+        <div id="start-recent-logs" class="recent-actions-list">
+          <div class="recent-action-item">
+            <span class="action-bullet green"></span>
+            <div class="action-details">
+              <strong>Local VFS Mounted</strong>
+              <small>Persistent localStorage ready</small>
+            </div>
+          </div>
+          <div class="recent-action-item">
+            <span class="action-bullet blue"></span>
+            <div class="action-details">
+              <strong>Zero-Telemetry Engine Active</strong>
+              <small>100% Client-Side Sandboxed</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="start-footer">
+      <div class="footer-user">
+        <div class="user-avatar">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+        </div>
+        <div class="user-meta">
+          <strong>Sandbox Admin</strong>
+          <small>Sovereign Node</small>
+        </div>
+      </div>
+      <button id="shutdown-btn" title="Shut Down Halo OS">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path>
+          <line x1="12" y1="2" x2="12" y2="12"></line>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- System Tray & Settings Dropdown panel -->
+  <div id="settings-tray" class="glass-panel hidden">
+    <div class="tray-header">
+      <h3>Quick Settings</h3>
+      <span class="security-status">Secure Connection Shielded</span>
+    </div>
+    
+    <!-- Quick System Controls -->
+    <div class="settings-grid">
+      <button class="settings-btn active" id="toggle-agent-sidebar-btn">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+        </svg>
+        <span>Copilot</span>
+      </button>
+      <button class="settings-btn active" id="tray-toggle-vpn-btn">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+        </svg>
+        <span>VPN Tunnel</span>
+      </button>
+      <button class="settings-btn" id="toggle-shield-btn">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+        </svg>
+        <span>Zero-Telemetry</span>
+      </button>
+      <button class="settings-btn" id="toggle-particles-btn">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m11.314 11.314l.707-.707"></path>
+        </svg>
+        <span>Live Canvas</span>
+      </button>
+    </div>
+
+    <!-- System Sliders -->
+    <div class="slider-group">
+      <label>
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+          <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+        </svg>
+        Volume
+      </label>
+      <input type="range" min="0" max="100" value="80" class="sys-slider" id="volume-slider">
+    </div>
+    
+    <div class="slider-group">
+      <label>
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+        Glass Blur
+      </label>
+      <input type="range" min="5" max="40" value="25" class="sys-slider" id="blur-slider">
+    </div>
+
+    <!-- Dock Customizer Section -->
+    <div class="tray-theme-section">
+      <h4>Dock Position</h4>
+      <div class="theme-selector-chips">
+        <span class="dock-chip active theme-chip" data-pos="bottom" style="flex-grow:1; text-align:center;">Bottom</span>
+        <span class="dock-chip theme-chip" data-pos="top" style="flex-grow:1; text-align:center;">Top</span>
+        <span class="dock-chip theme-chip" data-pos="left" style="flex-grow:1; text-align:center;">Left</span>
+        <span class="dock-chip theme-chip" data-pos="right" style="flex-grow:1; text-align:center;">Right</span>
+      </div>
+      <div style="margin-top: 10px; display: flex; align-items: center; justify-content: space-between;">
+        <span style="font-size: 11px; font-weight: 600; color: var(--text-secondary);">Auto-Hide Dock</span>
+        <input type="checkbox" id="dock-autohide-toggle" style="cursor: pointer;">
+      </div>
+    </div>
+
+    <!-- Theme Customizer Section -->
+    <div class="tray-theme-section">
+      <h4>System Theme</h4>
+      <div class="theme-selector-chips">
+        <span class="theme-chip active" data-theme="dark" style="background:#121820; border-color:#00e5ff;">Dark</span>
+        <span class="theme-chip" data-theme="light" style="background:#f4f7fa; color:#121820;">Light</span>
+        <span class="theme-chip" data-theme="cyberpunk" style="background:#1a0f2e; color:#ff007f; border-color:#ff007f;">Cyber</span>
+        <span class="theme-chip" data-theme="oled" style="background:#000000; color:#ffffff;">OLED</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Boot Loader / Splash Panel -->
+  <div id="boot-loader">
+    <div class="boot-logo-container">
+      <svg viewBox="0 0 24 24" width="64" height="64" class="boot-spinner" fill="none" stroke="#00e5ff" stroke-width="1.5">
+        <circle cx="12" cy="12" r="10" stroke-dasharray="30 10"></circle>
+        <path d="M12 6v6l4 2"></path>
+      </svg>
+      <h1 class="boot-title">HALO OS</h1>
+      <p class="boot-subtitle">Securing local sandbox nodes...</p>
+    </div>
+    <div class="boot-progress-bar">
+      <div class="boot-progress"></div>
+    </div>
+  </div>
+
+  <!-- Audio elements for high fidelity sound design -->
+  <audio id="sound-boot" src="data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQQAAAAAAA==" preload="auto"></audio>
+
+  <!-- ES6 module bootstrap -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
