@@ -36,7 +36,7 @@ class BlockchainApp {
     });
 
     if (win) {
-      win.content = win.querySelector('.window-content');
+      win.querySelector(".window-content") = win.querySelector('.window-content');
       this.setupStyles();
       this.renderContent(win);
       this.attachEvents(win);
@@ -159,7 +159,7 @@ class BlockchainApp {
   }
 
   renderContent(win) {
-    win.content.innerHTML = `
+    win.querySelector(".window-content").innerHTML = `
       <div class="bc-sidebar">
         <select class="bc-input" style="font-family: var(--font-family-sans);">
           <option>Halo Testnet</option>
@@ -196,7 +196,7 @@ class BlockchainApp {
   }
 
   renderBlocks(win) {
-    const chain = win.content.querySelector('#bc-chain');
+    const chain = win.querySelector(".window-content").querySelector('#bc-chain');
     if (!chain) return;
     chain.innerHTML = '';
     // Reverse blocks so newest is at top
@@ -218,13 +218,13 @@ class BlockchainApp {
   }
 
   attachEvents(win) {
-    const toggleBtn = win.content.querySelector('#bc-toggle-mining');
-    const hashrateEl = win.content.querySelector('#bc-hashrate');
-    const heightEl = win.content.querySelector('#bc-height');
-    const balanceEl = win.content.querySelector('#bc-balance');
-    const sendBtn = win.content.querySelector('#bc-send-tx');
-    const txTo = win.content.querySelector('#bc-tx-to');
-    const txAmt = win.content.querySelector('#bc-tx-amt');
+    const toggleBtn = win.querySelector(".window-content").querySelector('#bc-toggle-mining');
+    const hashrateEl = win.querySelector(".window-content").querySelector('#bc-hashrate');
+    const heightEl = win.querySelector(".window-content").querySelector('#bc-height');
+    const balanceEl = win.querySelector(".window-content").querySelector('#bc-balance');
+    const sendBtn = win.querySelector(".window-content").querySelector('#bc-send-tx');
+    const txTo = win.querySelector(".window-content").querySelector('#bc-tx-to');
+    const txAmt = win.querySelector(".window-content").querySelector('#bc-tx-amt');
 
     toggleBtn.addEventListener('click', () => {
       if (this.miningInterval) {

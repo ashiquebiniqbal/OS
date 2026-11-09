@@ -248,6 +248,31 @@ class HaloKernel {
           const module = await import('./apps/saas.js');
           module.default.launch();
         }
+      },
+      {
+        id: 'ide',
+        title: 'Sovereign IDE',
+        icon: `<svg viewBox="0 0 24 24" class="dock-icon" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="16 18 22 12 16 6"></polyline>
+                <polyline points="8 6 2 12 8 18"></polyline>
+              </svg>`,
+        launch: async () => {
+          const module = await import('./apps/ide.js');
+          module.default.launch();
+        }
+      },
+      {
+        id: 'store',
+        title: 'App Store',
+        icon: `<svg viewBox="0 0 24 24" class="dock-icon" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                <line x1="8" y1="21" x2="16" y2="21"></line>
+                <line x1="12" y1="17" x2="12" y2="21"></line>
+              </svg>`,
+        launch: async () => {
+          const module = await import('./apps/store.js');
+          module.default.launch();
+        }
       }
     ];
   }

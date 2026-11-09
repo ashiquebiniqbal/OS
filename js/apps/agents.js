@@ -39,7 +39,7 @@ class AgentsApp {
     });
 
     if (win) {
-      win.content = win.querySelector('.window-content');
+      win.querySelector(".window-content") = win.querySelector('.window-content');
       this.setupStyles();
       this.renderContent(win);
       this.attachEvents(win);
@@ -179,7 +179,7 @@ class AgentsApp {
   }
 
   renderContent(win) {
-    win.content.innerHTML = `
+    win.querySelector(".window-content").innerHTML = `
       <div class="agt-sidebar">
         <div class="agt-list" id="agt-list"></div>
         <div class="agt-bottom-bar">
@@ -231,7 +231,7 @@ class AgentsApp {
   }
 
   renderList(win) {
-    const list = win.content.querySelector('#agt-list');
+    const list = win.querySelector(".window-content").querySelector('#agt-list');
     list.innerHTML = '';
     this.agents.forEach(a => {
       const card = document.createElement('div');
@@ -252,7 +252,7 @@ class AgentsApp {
     this.selectedAgentId = id;
     this.renderList(win);
     
-    const panel = win.content.querySelector('#agt-panel');
+    const panel = win.querySelector(".window-content").querySelector('#agt-panel');
     const agent = this.agents.find(a => a.id === id);
     if (!agent) {
       panel.style.display = 'none';
@@ -260,19 +260,19 @@ class AgentsApp {
     }
     
     panel.style.display = 'flex';
-    win.content.querySelector('#agt-edit-name').value = agent.name;
-    win.content.querySelector('#agt-edit-role').value = agent.role;
-    win.content.querySelector('#agt-edit-model').value = agent.model;
-    win.content.querySelector('#agt-edit-prompt').value = agent.systemPrompt || '';
+    win.querySelector(".window-content").querySelector('#agt-edit-name').value = agent.name;
+    win.querySelector(".window-content").querySelector('#agt-edit-role').value = agent.role;
+    win.querySelector(".window-content").querySelector('#agt-edit-model').value = agent.model;
+    win.querySelector(".window-content").querySelector('#agt-edit-prompt').value = agent.systemPrompt || '';
     
-    const toggles = win.content.querySelectorAll('.agt-toggle-btn');
+    const toggles = win.querySelector(".window-content").querySelectorAll('.agt-toggle-btn');
     toggles.forEach(t => {
       t.classList.toggle('active', t.getAttribute('data-status') === agent.status);
     });
     
-    win.content.querySelector('#agt-stat-tokens').innerText = agent.tokenUsage || 0;
+    win.querySelector(".window-content").querySelector('#agt-stat-tokens').innerText = agent.tokenUsage || 0;
     
-    const delBtn = win.content.querySelector('#agt-delete-btn');
+    const delBtn = win.querySelector(".window-content").querySelector('#agt-delete-btn');
     if (agent.isSystem) {
       delBtn.style.display = 'none';
     } else {
@@ -281,7 +281,7 @@ class AgentsApp {
   }
 
   attachEvents(win) {
-    win.content.querySelector('#agt-new-btn').addEventListener('click', () => {
+    win.querySelector(".window-content").querySelector('#agt-new-btn').addEventListener('click', () => {
       const newId = 'agent-' + Date.now();
       this.agents.push({
         id: newId, name: 'New Agent', role: 'Custom', model: 'default', status: 'idle', tokenUsage: 0, lastActive: Date.now(), isSystem: false, systemPrompt: ''
@@ -290,23 +290,23 @@ class AgentsApp {
       this.selectAgent(win, newId);
     });
 
-    win.content.querySelectorAll('.agt-toggle-btn').forEach(btn => {
+    win.querySelector(".window-content").querySelectorAll('.agt-toggle-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
-        win.content.querySelectorAll('.agt-toggle-btn').forEach(t => t.classList.remove('active'));
+        win.querySelector(".window-content").querySelectorAll('.agt-toggle-btn').forEach(t => t.classList.remove('active'));
         e.target.classList.add('active');
       });
     });
 
-    win.content.querySelector('#agt-save-btn').addEventListener('click', () => {
+    win.querySelector(".window-content").querySelector('#agt-save-btn').addEventListener('click', () => {
       const agent = this.agents.find(a => a.id === this.selectedAgentId);
       if (!agent) return;
       
-      agent.name = win.content.querySelector('#agt-edit-name').value || 'Unnamed Agent';
-      agent.role = win.content.querySelector('#agt-edit-role').value;
-      agent.model = win.content.querySelector('#agt-edit-model').value;
-      agent.systemPrompt = win.content.querySelector('#agt-edit-prompt').value;
+      agent.name = win.querySelector(".window-content").querySelector('#agt-edit-name').value || 'Unnamed Agent';
+      agent.role = win.querySelector(".window-content").querySelector('#agt-edit-role').value;
+      agent.model = win.querySelector(".window-content").querySelector('#agt-edit-model').value;
+      agent.systemPrompt = win.querySelector(".window-content").querySelector('#agt-edit-prompt').value;
       
-      const activeToggle = win.content.querySelector('.agt-toggle-btn.active');
+      const activeToggle = win.querySelector(".window-content").querySelector('.agt-toggle-btn.active');
       if (activeToggle) agent.status = activeToggle.getAttribute('data-status');
       
       this.saveAgents();
@@ -314,7 +314,7 @@ class AgentsApp {
       alert('Agent settings saved securely.');
     });
 
-    win.content.querySelector('#agt-delete-btn').addEventListener('click', () => {
+    win.querySelector(".window-content").querySelector('#agt-delete-btn').addEventListener('click', () => {
       const agent = this.agents.find(a => a.id === this.selectedAgentId);
       if (agent && !agent.isSystem) {
         if(confirm('Are you sure you want to terminate this agent?')) {

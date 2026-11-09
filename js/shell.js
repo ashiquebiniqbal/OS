@@ -404,6 +404,70 @@ class DesktopShell {
       }
     });
 
+    // ========== FREE-FLOATING DRAGGABLE DOCK ==========
+    const dockEl = document.getElementById('dock');
+    let isDraggingDock = false;
+    let dockStartX, dockStartY, initialDockLeft, initialDockTop;
+    
+    dockEl.addEventListener('mousedown', (e) => {
+      // Don't drag if clicking an interactive element
+      if (e.target.closest('.dock-item') || e.target.closest('button') || e.target.closest('.dock-chip')) return;
+      
+      isDraggingDock = true;
+      dockStartX = e.clientX;
+      dockStartY = e.clientY;
+      
+      const rect = dockContainer.getBoundingClientRect();
+      if (!dockContainer.style.left || dockContainer.style.left === '0px' && !document.body.className.includes('dock-floating')) {
+         dockContainer.style.left = rect.left + 'px';
+         dockContainer.style.top = rect.top + 'px';
+         dockContainer.style.bottom = 'auto';
+         dockContainer.style.right = 'auto';
+         document.body.classList.remove('dock-bottom', 'dock-top', 'dock-left', 'dock-right');
+         document.body.classList.add('dock-floating');
+      }
+      
+      initialDockLeft = parseInt(dockContainer.style.left || rect.left, 10);
+      initialDockTop = parseInt(dockContainer.style.top || rect.top, 10);
+      
+      dockEl.style.cursor = 'grabbing';
+      e.preventDefault();
+    });
+
+    document.addEventListener('mousemove', (e) => {
+      if (!isDraggingDock) return;
+      const dx = e.clientX - dockStartX;
+      const dy = e.clientY - dockStartY;
+      
+      dockContainer.style.left = (initialDockLeft + dx) + 'px';
+      dockContainer.style.top = (initialDockTop + dy) + 'px';
+      dockContainer.style.bottom = 'auto';
+      dockContainer.style.right = 'auto';
+      dockContainer.style.transform = 'none'; // Overrides autohide transform
+    });
+
+    document.addEventListener('mouseup', () => {
+      if (isDraggingDock) {
+        isDraggingDock = false;
+        dockEl.style.cursor = 'grab';
+        localStorage.setItem('halo_dock_custom_pos', dockContainer.style.left + ',' + dockContainer.style.top);
+        
+        // Remove active state from snap chips when free floating
+        dockChips.forEach(c => c.classList.remove('active'));
+      }
+    });
+
+    // Restore free-floating position on load
+    const savedCustomPos = localStorage.getItem('halo_dock_custom_pos');
+    if (savedCustomPos && document.body.classList.contains('dock-floating')) {
+      const [left, top] = savedCustomPos.split(',');
+      dockContainer.style.left = left;
+      dockContainer.style.top = top;
+      dockContainer.style.bottom = 'auto';
+      dockContainer.style.right = 'auto';
+    }
+    dockEl.style.cursor = 'grab';
+
     // Power off handler
     document.getElementById('shutdown-btn').addEventListener('click', () => {
       const boot = document.getElementById('boot-loader');

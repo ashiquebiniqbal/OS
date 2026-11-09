@@ -19,7 +19,7 @@ class SaaSApp {
     });
 
     if (win) {
-      win.content = win.querySelector('.window-content');
+      win.querySelector(".window-content") = win.querySelector('.window-content');
       this.setupStyles();
       this.renderContent(win);
       this.attachEvents(win);
@@ -174,7 +174,7 @@ class SaaSApp {
   }
 
   renderContent(win) {
-    win.content.innerHTML = `
+    win.querySelector(".window-content").innerHTML = `
       <div class="saas-tab-bar">
         <div class="saas-tab" data-tab="docs">Halo Docs</div>
         <div class="saas-tab" data-tab="sheets">Halo Sheets</div>
@@ -220,7 +220,7 @@ class SaaSApp {
   }
 
   renderSheetsGrid(win) {
-    const table = win.content.querySelector('#sheets-grid');
+    const table = win.querySelector(".window-content").querySelector('#sheets-grid');
     const cols = 10;
     const rows = 20;
     let html = '<tr><th class="corner"></th>';
@@ -244,40 +244,40 @@ class SaaSApp {
 
   attachEvents(win) {
     // Tabs
-    const tabs = win.content.querySelectorAll('.saas-tab');
+    const tabs = win.querySelector(".window-content").querySelectorAll('.saas-tab');
     tabs.forEach(t => {
       t.addEventListener('click', () => this.switchTab(win, t.getAttribute('data-tab')));
     });
 
     // Docs Events
     const exec = (cmd, val) => document.execCommand(cmd, false, val);
-    win.content.querySelector('#docs-bold').addEventListener('click', () => exec('bold'));
-    win.content.querySelector('#docs-italic').addEventListener('click', () => exec('italic'));
-    win.content.querySelector('#docs-h1').addEventListener('click', () => exec('formatBlock', 'H1'));
-    win.content.querySelector('#docs-h2').addEventListener('click', () => exec('formatBlock', 'H2'));
-    win.content.querySelector('#docs-list').addEventListener('click', () => exec('insertUnorderedList'));
+    win.querySelector(".window-content").querySelector('#docs-bold').addEventListener('click', () => exec('bold'));
+    win.querySelector(".window-content").querySelector('#docs-italic').addEventListener('click', () => exec('italic'));
+    win.querySelector(".window-content").querySelector('#docs-h1').addEventListener('click', () => exec('formatBlock', 'H1'));
+    win.querySelector(".window-content").querySelector('#docs-h2').addEventListener('click', () => exec('formatBlock', 'H2'));
+    win.querySelector(".window-content").querySelector('#docs-list').addEventListener('click', () => exec('insertUnorderedList'));
     
-    win.content.querySelector('#docs-save').addEventListener('click', () => {
-      const content = win.content.querySelector('#docs-editor').innerHTML;
+    win.querySelector(".window-content").querySelector('#docs-save').addEventListener('click', () => {
+      const content = win.querySelector(".window-content").querySelector('#docs-editor').innerHTML;
       if (!VFS.exists('/Documents')) VFS.mkdir('/Documents');
       VFS.write('/Documents/HaloDoc.html', content);
       VFS.logAction('Saved HaloDoc.html');
       alert('Document saved to VFS.');
     });
 
-    win.content.querySelector('#docs-load').addEventListener('click', () => {
+    win.querySelector(".window-content").querySelector('#docs-load').addEventListener('click', () => {
       const content = VFS.read('/Documents/HaloDoc.html');
       if (content !== null) {
-        win.content.querySelector('#docs-editor').innerHTML = content;
+        win.querySelector(".window-content").querySelector('#docs-editor').innerHTML = content;
       } else {
         alert('No saved document found at /Documents/HaloDoc.html');
       }
     });
 
     // Sheets Events
-    const cells = win.content.querySelectorAll('.sheets-cell');
-    const activeLabel = win.content.querySelector('#sheets-active-cell');
-    const formulaInput = win.content.querySelector('#sheets-formula-input');
+    const cells = win.querySelector(".window-content").querySelectorAll('.sheets-cell');
+    const activeLabel = win.querySelector(".window-content").querySelector('#sheets-active-cell');
+    const formulaInput = win.querySelector(".window-content").querySelector('#sheets-formula-input');
     let activeCellInput = null;
 
     // We store raw formulas here, while inputs show evaluated values (simple implementation)
@@ -312,21 +312,21 @@ class SaaSApp {
     });
     formulaInput.addEventListener('blur', () => this.evaluateSheet(win));
 
-    win.content.querySelector('#sheets-save').addEventListener('click', () => {
+    win.querySelector(".window-content").querySelector('#sheets-save').addEventListener('click', () => {
       if (!VFS.exists('/Documents')) VFS.mkdir('/Documents');
       VFS.write('/Documents/HaloSheet.json', JSON.stringify(this.sheetData));
       VFS.logAction('Saved HaloSheet.json');
       alert('Spreadsheet saved to VFS.');
     });
 
-    win.content.querySelector('#sheets-load').addEventListener('click', () => {
+    win.querySelector(".window-content").querySelector('#sheets-load').addEventListener('click', () => {
       const raw = VFS.read('/Documents/HaloSheet.json');
       if (raw !== null) {
         try {
           this.sheetData = JSON.parse(raw);
           // populate
           for (let id in this.sheetData) {
-            const input = win.content.querySelector(`.sheets-cell[data-cell="${id}"]`);
+            const input = win.querySelector(".window-content").querySelector(`.sheets-cell[data-cell="${id}"]`);
             if (input) input.value = this.sheetData[id];
           }
           this.evaluateSheet(win);
@@ -341,7 +341,7 @@ class SaaSApp {
 
   evaluateSheet(win) {
     // Simple SUM(A1:A5) evaluation
-    const cells = win.content.querySelectorAll('.sheets-cell');
+    const cells = win.querySelector(".window-content").querySelectorAll('.sheets-cell');
     
     // First pass: restore raw formulas
     cells.forEach(c => {
@@ -386,11 +386,11 @@ class SaaSApp {
 
   switchTab(win, tabName) {
     this.activeTab = tabName;
-    win.content.querySelectorAll('.saas-tab').forEach(t => t.classList.remove('active'));
-    win.content.querySelector(`.saas-tab[data-tab="${tabName}"]`).classList.add('active');
+    win.querySelector(".window-content").querySelectorAll('.saas-tab').forEach(t => t.classList.remove('active'));
+    win.querySelector(".window-content").querySelector(`.saas-tab[data-tab="${tabName}"]`).classList.add('active');
 
-    win.content.querySelectorAll('.saas-view').forEach(v => v.classList.remove('active'));
-    win.content.querySelector(`#saas-view-${tabName}`).classList.add('active');
+    win.querySelector(".window-content").querySelectorAll('.saas-view').forEach(v => v.classList.remove('active'));
+    win.querySelector(".window-content").querySelector(`#saas-view-${tabName}`).classList.add('active');
   }
 }
 
